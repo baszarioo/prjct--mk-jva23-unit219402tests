@@ -17,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
+//import static org.assertj.core.api.AbstractSoftAssertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,5 +67,14 @@ when(studioRepository.findAll(Mockito.any(Pageable.class))).thenReturn(studios);
         StudioDto updateReturn= studioService.updateStudio(studioDto, studioId);
         Assertions.assertThat(updateReturn).isNotNull();
     }
+    @Test
+    public void PokemonService_DeletePokemonById_ReturnVoid() {
+        int pokemonId = 1;
+        Studio pokemon = Studio.builder().id(1).name("tattooshop").city("london").city("this is a city").build();
 
+        when(studioRepository.findById(pokemonId)).thenReturn(Optional.ofNullable(pokemon));
+        doNothing().when(studioRepository).delete(pokemon);
+
+        assertAll(() -> studioService.deleteStudioId(pokemonId));
+    }
 }
