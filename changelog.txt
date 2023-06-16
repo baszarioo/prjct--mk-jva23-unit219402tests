@@ -1,0 +1,161 @@
+1; User -> UserRepository	
+2; application.properties.
+
+3. create database tattostack;
+4. use tattostack;
+show tables;
+
+CREATE TABLE Studio (
+  Id INT PRIMARY KEY AUTO_INCREMENT,
+  Name TEXT,
+  Address TEXT
+);
+
+CREATE TABLE Tattoo_specs (
+  Id INT PRIMARY KEY AUTO_INCREMENT,
+  Name TEXT,
+  Style TEXT,
+  Body TEXT,
+  Price INT,
+  Studio_ID INT,
+  Size TEXT,
+  FOREIGN KEY (Studio_ID) REFERENCES Studio(Id)
+);
+
+CREATE TABLE Artist (
+  Artist_Id INT PRIMARY KEY,
+  Name TEXT,
+  Specialization_style TEXT,
+  Start_time TIME,
+  End_time TIME,
+  Days TEXT,
+  Studio_Id INT,
+  FOREIGN KEY (Studio_Id) REFERENCES Studio(Id)
+  FOREIGN KEY (Artist_Id) REFERENCES Users(Id)
+);
+
+CREATE TABLE Client (
+  Client_Id INT PRIMARY KEY AUTO_INCREMENT,
+  Name TEXT,
+  Email TEXT,
+  FOREIGN KEY (Client_id) REFERENCES Users(Id)
+);
+
+CREATE TABLE Tattoo_session (
+  Id INT PRIMARY KEY AUTO_INCREMENT,
+  Tattoo_specs_id INT,
+  Artist_id INT,
+  Client_id INT,
+  Date TIMESTAMP,
+  Studio_ID INT,
+  Accepted TINYINT,
+  FOREIGN KEY (Tattoo_specs_Id) REFERENCES Tattoo_specs(Id),
+  FOREIGN KEY (Artist_Id) REFERENCES Artist(Artist_Id),
+  FOREIGN KEY (Client_Id) REFERENCES Client(Client_Id),
+  FOREIGN KEY (Studio_Id) REFERENCES Studio(Id)
+);
+
+CREATE TABLE Reviews (		// to zrobić jeszcze 04.06
+  Id INT PRIMARY KEY AUTO_INCREMENT,
+  Review TEXT,
+  User TEXT,
+  TattooSessionId INT,
+  Timestamp TIMESTAMP,
+  FOREIGN KEY (TattooSessionId) REFERENCES Tattoo_session(Id)
+);
+
+////////////////////////////////////// Triggers x Procedures (JESZCZE NIE UZYWAC)!///////////////////////////////////////
+CREATE TRIGGER update_artist_end_time
+AFTER INSERT ON Tattoo_session
+FOR EACH ROW
+BEGIN
+    UPDATE Artist
+    SET End_time = NEW.Date
+    WHERE Artist.Id = NEW.Artist_id;
+END;
+
+CREATE PROCEDURE GetTattooSessionsByClient(IN clientId INT)
+BEGIN
+    SELECT ts.Id, ts.Date, ts.Accepted, t.Name AS TattooSpecsName, a.Name AS ArtistName
+    FROM Tattoo_session ts
+    JOIN Tattoo_specs t ON ts.Tattoo_specs_id = t.Id
+    JOIN Artist a ON ts.Artist_id = a.Id
+    WHERE ts.Client_id = clientId;
+END;
+
+
+CALL GetTattooSessionsByClient(1);
+/
+
+
+
+///////////////////////////// OneToOne / relations for tattoo./session	////////////////////////////////////////////
+
+ALTER TABLE table_name 
+MODIFY COLUMN id INTEGER PRIMARY KEY AUTO_INCREMENT;
+
+DROP TABLE table_name;
+
+
+///////////////////
+
+CREATE TABLE Users (
+  Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  Username varchar(255) NOT NULL,
+  Password varchar(255) NOT NULL,
+  Email varchar(255) NOT NULL
+);
+
+CREATE TABLE Users_roles (
+  User_id INT,
+  roles_id INT,
+  FOREIGN KEY (User_id) REFERENCES Users(id),
+  FOREIGN KEY (roles_id) REFERENCES Roles(id)
+);
+
+CREATE TABLE Roles (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255)
+);
+
+////////////////////////////////// Crud Java app - additional fields not in database /////////////////////////////////////
+Yes, a class in your Java CRUD applications can have additional fields that are not presesnt in the corresponding database table. This is a common practice and is known as having a "domain model" or "domain entity" that represents the business logic and functionality of your application.
+In many cases, the domain model may include additional fields, methods, or computed properties that are not stored directly in the database but are useful for implementing business logc, performing calculations, or encapsulating behavior specific to your application.
+Here's an example to illustrate this concept:
+@Entity
+@Table(name="employees")
+public class Employee {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	private String firstName;
+	private String lastName;
+	private String email;
+	
+	//Additional fields that are not in the database.
+	private String fullName;
+	private boolean active;
+	
+	//Constructors, getters, setters, and other methods.
+In the above example, the `Employee` class erepresents a database table called "employees" and includes fields for `id`, `firstName`, `lastName`, and `email`, which correspond directly to columns in the database. Additionally, there are two additional fields, `fullName` and `active`, that are not stored in the database but are used for additional functionality within the Java application. 
+
+These additional fields can be helpful for various purposes, such as displaying the full name of an employee by concatenating the frist and last name, or maintaining an active/inactive status for an employee based on certain conditions.
+	It's important to note that while the additional fields in the Java class are not stored in the database, you should 
+consider their usage and ensure they align with your application's requirements and design.
+
+
+////////////////////////////////////// AUTOMATIZATION OF CREATING USER ////////////////////////////////////////////////
+
+Yes, it can be automated. You could use a trigger in the database to create a new record in the users table when an artist or client registers. This would be triggered by the INSERT statement for the artist or client records.
+
+Can you provide to me how it should look?
+
+The trigger should look something like this:
+
+CREATE TRIGGER BeforeInsert
+BEFORE INSERT ON Artist OR Client FOR EACH ROW
+BEGIN
+INSERT INTO users (id, artist_id, client_id, role)
+VALUES (NEW.id, NEW.artist_id, NEW.client_id, 'artist' OR 'client');
+END;
