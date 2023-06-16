@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
+import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
@@ -73,6 +74,16 @@ public class StudioRepositoryTests {
         Studio updatedStudio  = studioRepository.save(studioSave);
         Assertions.assertThat(updatedStudio.getName()).isNotNull();
         Assertions.assertThat(updatedStudio.getCity()).isNotNull();
+    }
+    @Test
+    public void StudioRepository_DeleteStudio_ReturnStudioNotNull() {
+        Studio studio = Studio.builder()
+                .name("tattoo-bapka")
+                .city("manchester").build();
+        studioRepository.save(studio);
+        studioRepository.deleteById(studio.getId());
+        Optional<Studio> studioReturn= studioRepository.findById(studio.getId());
+        Assertions.assertThat(studioReturn).isEmpty();
     }
 }
 
