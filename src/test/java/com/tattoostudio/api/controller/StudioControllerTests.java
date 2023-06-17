@@ -27,9 +27,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.Arrays;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(controllers= StudioController.class)
 @AutoConfigureMockMvc(addFilters=false)
@@ -74,5 +74,35 @@ public class StudioControllerTests {
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content.size()",
         CoreMatchers.is(responseDto.getContent().size())));
+    }
+    @Test
+    public void StudioController_StudioDetail_ReturnStudioDto() throws Exception {
+        int studioId=1;
+        when(studioService.getStudioById(studioId)).thenReturn(studioDto);
+        ResultActions response = mockMvc.perform(get("/api/studio/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studioDto)));
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(studioDto.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.city", CoreMatchers.is(studioDto.getCity())));
+    }
+    @Test
+    public void StudioController_UpdateStudio_ReturnStudioDto() throws Exception {
+        int studioId=1;
+        when(studioService.updateStudio(studioDto, studioId)).thenReturn(studioDto);
+        ResultActions response = mockMvc.perform(put("/api/studio/1/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studioDto)));
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name",CoreMatchers.is(studioDto.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.city",CoreMatchers.is(studioDto.getCity())));
+    }
+    @Test
+    public void StudioController_DeleteStudio_ReturnString() throws Exception{
+        int studioId=1;
+        doNothing().when(studioService).deleteStudioId(1);
+        ResultActions response = mockMvc.perform(delete("/api/studio/1/delete")
+                .contentType(MediaType.APPLICATION_JSON));
+        response.andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
