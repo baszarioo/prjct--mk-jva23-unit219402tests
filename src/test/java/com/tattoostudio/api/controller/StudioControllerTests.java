@@ -66,7 +66,7 @@ public class StudioControllerTests {
     @Test
     public void StudioController_GetAllStudios_ReturnResponseDto() throws Exception {
         StudioResponse responseDto = StudioResponse.builder().pageSize(10).last(true).pageNo(1).content(Arrays.asList(studioDto)).build();
-        when(studioService.getAllStudio(1,10)).thenReturn(responseDto);
+        when(studioService.getAllStudios(1,10)).thenReturn(responseDto);
         ResultActions response = mockMvc.perform(get("/api/studio")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("pageNo","1")

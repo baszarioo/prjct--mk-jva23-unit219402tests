@@ -40,7 +40,7 @@ public class StudioServiceImpl implements StudioService {
     }
 
     @Override
-    public StudioResponse getAllStudio(int pageNo, int pageSize) {
+    public StudioResponse getAllStudios(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<Studio> studios = studioRepository.findAll(pageable);
         List<Studio> listOfStudio = studios.getContent();

@@ -5,7 +5,7 @@ import com.tattoostudio.api.dto.StudioResponse;
 
 public interface StudioService {
     StudioDto createStudio(StudioDto pokemonDto);
-    StudioResponse getAllStudio(int pageNo, int pageSize);
+    StudioResponse getAllStudios(int pageNo, int pageSize);
     StudioDto getStudioById(int id);
     StudioDto updateStudio(StudioDto pokemonDto, int id);
     void deleteStudioId(int id);
