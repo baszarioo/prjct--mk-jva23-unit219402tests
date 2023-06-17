@@ -22,5 +22,5 @@ public class Studio {
     private String city;
 
     @OneToMany(mappedBy = "studio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Rating> reviews = new ArrayList<Rating>();
+    private List<Rating> ratings = new ArrayList<Rating>();
 }

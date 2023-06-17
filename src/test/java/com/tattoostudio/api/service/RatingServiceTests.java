@@ -16,8 +16,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,6 +50,35 @@ when(ratingRepository.save(Mockito.any(Rating.class))).thenReturn(rating);
     }
     @Test
     public void RatingService_GetRatingsByStudioId_ReturnRatingDto(){
-//        .... to be continued.
+        int ratingId=1;
+        int studioId=1;
+        rating.setStudio(studio);
+when(studioRepository.findById(studioId)).thenReturn(Optional.of(studio));
+when(ratingRepository.findById(ratingId)).thenReturn(Optional.of(rating));
+        RatingDto ratingReturn = ratingService.getRatingById(ratingId, studioId);
+        Assertions.assertThat(ratingReturn).isNotNull();
+        Assertions.assertThat(ratingReturn).isNotNull();
+    }
+    @Test
+    public void RatingService_UpdateStudio_ReturnRatingDto(){
+        int studioId=1;
+        int ratingId=1;
+        studio.setRatings(Arrays.asList(rating));
+        rating.setStudio(studio);
+when(studioRepository.findById(studioId)).thenReturn(Optional.of(studio));
+when(ratingRepository.findById(ratingId)).thenReturn(Optional.of(rating));
+when(ratingRepository.save(rating)).thenReturn(rating);
+        RatingDto updateReturn=ratingService.updateRating(studioId, ratingId, ratingDto);
+        Assertions.assertThat(updateReturn).isNotNull();
+    }
+    @Test
+    public void RatingService_DeleteStudioById_ReturnVoid() {
+        int studioId=1;
+        int ratingId=1;
+        studio.setRatings(Arrays.asList(rating));
+        rating.setStudio(studio);
+when(studioRepository.findById(studioId)).thenReturn(Optional.of(studio));
+when(ratingRepository.findById(studioId)).thenReturn(Optional.of(rating));
+        assertAll(()->ratingService.deleteRating(studioId, ratingId));
     }
 }
