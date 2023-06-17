@@ -24,7 +24,7 @@ public class StudioController {
             @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize
     ) {
-        return new ResponseEntity<>(studioService.getAllStudio(pageNo, pageSize), HttpStatus.OK);
+        return new ResponseEntity<>(studioService.getAllStudios(pageNo, pageSize), HttpStatus.OK);
     }
 
     @GetMapping("studio/{id}")

@@ -43,7 +43,7 @@ public class StudioServiceTests {
     public void StudioService_GetAllStudios_ReturnsResponseDto() {
         Page<Studio> studios = Mockito.mock(Page.class);
 when(studioRepository.findAll(Mockito.any(Pageable.class))).thenReturn(studios);
-        StudioResponse saveStudio = studioService.getAllStudio(1,10);
+        StudioResponse saveStudio = studioService.getAllStudios(1,10);
         Assertions.assertThat(saveStudio).isNotNull();
     }
     ////////////////////////////////////////////////////////////////////////
