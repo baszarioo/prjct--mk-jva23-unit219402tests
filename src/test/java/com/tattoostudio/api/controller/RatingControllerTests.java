@@ -60,7 +60,7 @@ public class RatingControllerTests {
         int studioId=1;
         int ratingId=1;
         when(ratingService.updateRating(studioId, ratingId, ratingDto)).thenReturn(ratingDto);
-        ResultActions response=mockMvc.perform(put("/api.studio/1/reviews/1")
+        ResultActions response=mockMvc.perform(put("/api/studio/1/ratings/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(ratingDto)));
         response.andExpect(MockMvcResultMatchers.status().isOk())
