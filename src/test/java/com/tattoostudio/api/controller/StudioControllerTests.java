@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tattoostudio.api.controllers.StudioController;
 import com.tattoostudio.api.dto.RatingDto;
 import com.tattoostudio.api.dto.StudioDto;
+import com.tattoostudio.api.dto.StudioResponse;
 import com.tattoostudio.api.models.Rating;
 import com.tattoostudio.api.models.Studio;
 import com.tattoostudio.api.service.StudioService;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +24,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Arrays;
+
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(controllers= StudioController.class)
@@ -52,6 +58,21 @@ public class StudioControllerTests {
         ResultActions response=mockMvc.perform(post("/api/studio/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(studioDto)));
-        response.andExpect(MockMvcResultMatchers.status().isCreated());
+//        response.andExpect(MockMvcResultMatchers.status().isCreated());
+        response.andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(studioDto.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.city", CoreMatchers.is(studioDto.getCity())));
+    }
+    @Test
+    public void StudioController_GetAllStudios_ReturnResponseDto() throws Exception {
+        StudioResponse responseDto = StudioResponse.builder().pageSize(10).last(true).pageNo(1).content(Arrays.asList(studioDto)).build();
+        when(studioService.getAllStudio(1,10)).thenReturn(responseDto);
+        ResultActions response = mockMvc.perform(get("/api/studio")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("pageNo","1")
+                .param("pageSize", "10"));
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content.size()",
+        CoreMatchers.is(responseDto.getContent().size())));
     }
 }
